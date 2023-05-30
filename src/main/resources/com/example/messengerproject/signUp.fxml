@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -53,11 +54,6 @@
                         <Font name="Microsoft YaHei Light" size="16.0" />
                     </font>
                 </TextField>
-                <TextField fx:id="tf_password_s" layoutX="135.0" layoutY="214.0">
-                    <font>
-                        <Font name="Microsoft YaHei Light" size="16.0" />
-                    </font>
-                </TextField>
                 <Button fx:id="bt_sigup_s" layoutX="168.0" layoutY="274.0" mnemonicParsing="false" text="Sign up">
                     <font>
                         <Font name="Microsoft YaHei Light" size="17.0" />
@@ -73,6 +69,11 @@
                         <Font name="Microsoft YaHei Light" size="15.0" />
                     </font>
                 </Button>
+            <PasswordField fx:id="tf_password_s" layoutX="134.0" layoutY="212.0">
+               <font>
+                  <Font name="Microsoft YaHei Light" size="16.0" />
+               </font>
+            </PasswordField>
             </children></AnchorPane>
     </items>
 </SplitPane>

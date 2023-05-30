@@ -32,9 +32,9 @@ public class signUpController {
 
             if(!Name.isBlank()&& !Password.isBlank()){
                 clientConnection.getClient().initializeUser(Name, Password, "signUp");
-                String status="Success";
+                String status=clientConnection.getClient().getStatus();;
                 if(status.equals("Success")){
-                    commonMethods.changeScene(bt_sigup_s,"hello-view.fxml", "Main page" );
+                    commonMethods.changeScene(bt_sigup_s,"hello-view.fxml", "Main page", Name);
                 }
                 else{
                     Alert alert= new Alert(Alert.AlertType.CONFIRMATION,"Do you already have an account?" , ButtonType.YES,ButtonType.NO);

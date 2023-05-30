@@ -11,6 +11,7 @@ import java.io.*;
 import java.net.Socket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class ServerLogic implements Runnable {
 
@@ -19,6 +20,8 @@ public class ServerLogic implements Runnable {
     private BufferedWriter bufferedWriter;
     private User user;
 
+    private static ArrayList<String> userNames= new ArrayList<>();
+
     public ServerLogic(Socket socket){
         this.socket=socket;
         try {
@@ -26,7 +29,7 @@ public class ServerLogic implements Runnable {
             bufferedReader= new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            closeAllandRemove(socket, bufferedReader, bufferedWriter, user.getName());
         }
     }
 
@@ -40,9 +43,15 @@ public class ServerLogic implements Runnable {
                 SaxParser saxp = new SaxParser();
                 InputStream m2 = new ByteArrayInputStream(message.getBytes());
                 parser.parse(m2, saxp);
-                user=saxp.getUser();
-                doAction(saxp.getType());
-            } catch (IOException | SAXException | ParserConfigurationException e) {
+                //userNames.add(user.getName());
+                doAction(saxp,saxp.getType());
+            } catch (IOException e){
+                userNames.remove(user.getName());
+                closeAllandRemove(socket, bufferedReader, bufferedWriter, user.getName());
+                System.out.println(userNames);
+                break;
+            }
+            catch (SAXException | ParserConfigurationException e) {
                 throw new RuntimeException(e);
             }
     }
@@ -54,29 +63,43 @@ public class ServerLogic implements Runnable {
             bufferedWriter.newLine();
             bufferedWriter.flush();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            closeAllandRemove(socket, bufferedReader, bufferedWriter, user.getName());
+            //closeAll(socket, bufferedReader, bufferedWriter);
+            //throw new RuntimeException(e);
         }
     }
-    private void doAction(String type) {
+    private void doAction(SaxParser saxp, String type) {
         String status="";
+        if(type.equals("logIn")||type.equals("signUp")){
+            user=saxp.getUser();
         if(type.equals("logIn")){
             status = logInUser();
         }
         else if(type.equals("signUp")){
             status = initializeUser();
         }
-        System.out.println("Ready to send message");
         String str= String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>%s</type><status>%s</status></message>", type, status);
         sendToUser(str);
+        if(status.equals("Success")){
+            userNames.add(user.getName());
+            System.out.println("user:"+userNames);
+            }
+        }
+        else{
+            if(type.equals("userList")){
+                String str=getUserList();
+                System.out.println(str);
+                sendToUser(str);
+            }
+        }
     }
 
     private String initializeUser() {
         DbHandler dbHandler= new DbHandler();
         ResultSet rs= dbHandler.checkUnique(user);
         String status= checkPresence(rs);
-        System.out.println(status);
         if(status.equals("Success")){
-           return "Fail" ;
+           return "Fail";
         }
         else{
         dbHandler.WriteUser(user);
@@ -101,20 +124,45 @@ public class ServerLogic implements Runnable {
            throw new RuntimeException(e);
        }
        if(counter==1){
-           /////
-       System.out.println("Ok");
        return "Success";}
        else{
-           //////
-           System.out.println("Problem");
            return "Fail";
        }
     }
+    private String getUserList(){
+        String str = String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>userList</type><users>");
+       for(String s:userNames){
+           str+=String.format("<user>%s</user>", s);
+       }
+        str+="</users></message>";
+        return str;
+    }
+    public void removeUser(String name){
+        userNames.remove(name);
+        //System.out.println(userNames);
+    }
 
+    public void closeAll(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter){
+        try{
+            if(bufferedReader!=null){
+                bufferedReader.close();
+            }
+            if(bufferedWriter!= null){
+                bufferedWriter.close();
+            }
+            if(socket!=null){
+                socket.close();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void closeAllandRemove(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter, String name){
+        removeUser(name);
+        closeAll(socket, bufferedReader, bufferedWriter);
+    }
     @Override
     public void run() {
        getUserInformation();
         }
-
-
 }

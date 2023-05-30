@@ -2,37 +2,41 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #FFF8DC;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.messengerproject.HelloController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="431.0" prefWidth="600.0" style="-fx-background-color: #FFF8DC;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.messengerproject.HelloController">
     <children>
-        <Pane layoutX="366.0" prefHeight="400.0" prefWidth="233.0" style="-fx-background-color: #C4A484;">
+        <Pane layoutX="366.0" prefHeight="431.0" prefWidth="234.0" style="-fx-background-color: #C4A484;">
             <children>
                 <Label layoutX="14.0" layoutY="26.0" text="You are logged in as">
                     <font>
                         <Font name="Microsoft YaHei Light" size="15.0" />
                     </font>
                 </Label>
-                <Label fx:id="userName_m" layoutX="89.0" layoutY="60.0" text="Name">
+                <Label fx:id="userName_m" layoutX="99.0" layoutY="59.0" text="Name">
                     <font>
-                        <Font name="Microsoft YaHei Light" size="20.0" />
+                        <Font name="Microsoft YaHei Light" size="22.0" />
                     </font>
                 </Label>
-                <TextArea fx:id="usersList" layoutX="10.0" layoutY="101.0" prefHeight="289.0" prefWidth="215.0" style="-fx-border-color: #6E260E;" />
+            <ListView fx:id="lv_connected" layoutX="17.0" layoutY="98.0" prefHeight="307.0" prefWidth="200.0" style="-fx-border-color: #6E260E;" />
             </children>
         </Pane>
-        <ScrollPane fx:id="sp_conversation" layoutX="4.0" layoutY="11.0" prefHeight="338.0" prefWidth="359.0" style="-fx-border-color: #6E260E;" />
-        <TextField fx:id="tf_text" layoutX="14.0" layoutY="359.0" prefHeight="26.0" prefWidth="277.0" />
-        <Button fx:id="bt_send" layoutX="300.0" layoutY="357.0" mnemonicParsing="false" text="Send">
+        <ScrollPane fx:id="sp_conversation" layoutX="13.0" layoutY="44.0" prefHeight="338.0" prefWidth="346.0" style="-fx-border-color: #6E260E;" />
+        <TextField fx:id="tf_text" layoutX="13.0" layoutY="388.0" prefHeight="26.0" prefWidth="277.0" />
+        <Button fx:id="bt_send" layoutX="300.0" layoutY="387.0" mnemonicParsing="false" text="Send">
             <font>
                 <Font name="Microsoft YaHei Light" size="15.0" />
             </font>
         </Button>
+      <Label fx:id="chatWith_m" layoutX="159.0" layoutY="14.0" text="Name">
+         <font>
+            <Font name="Microsoft YaHei Light" size="20.0" />
+         </font>
+      </Label>
     </children>
 </AnchorPane>
-

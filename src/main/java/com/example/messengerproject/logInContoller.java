@@ -6,8 +6,6 @@ import java.util.Optional;
 
 public class logInContoller {
     @FXML
-    TextField tf_ip;
-    @FXML
     TextField tf_userName;
     @FXML
     TextField tf_password;
@@ -27,12 +25,11 @@ public class logInContoller {
         bt_logIn_l.setOnAction(event -> {
             String Name = tf_userName.getText().trim();
             String Password = tf_password.getText().trim();
-            String ip = tf_ip.getText().trim();
-            if (!Name.isBlank() && !Password.isBlank() && !ip.isBlank()) {
+            if (!Name.isBlank() && !Password.isBlank()) {
                 clientConnection.getClient().initializeUser(Name, Password, "logIn");
                 String status = clientConnection.getClient().getStatus();
                 if (status.equals("Success")) {
-                    commonMethods.changeScene(bt_logIn_l, "hello-view.fxml", "Main page");
+                    commonMethods.changeScene(bt_logIn_l, "hello-view.fxml", "Main page", Name);
                 } else {
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Do you already have an account?", ButtonType.YES, ButtonType.NO);
                     alert.setTitle("Have an account?");

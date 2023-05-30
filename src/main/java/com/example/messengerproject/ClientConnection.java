@@ -18,14 +18,14 @@ public class ClientConnection {
     }
     public static synchronized ClientConnection getInstance() {
         if (instance == null) {
-            throw new IllegalStateException("Singleton instance is not initialized. Call initialize() method first.");
+            throw new IllegalStateException("ClientServer instance is not initialized. Call initialize() method first.");
         }
         return instance;
     }
 
     public static synchronized void initialize(String parameter) {
         if (instance != null) {
-            throw new IllegalStateException("Singleton instance is already initialized.");
+            throw new IllegalStateException("ClientServer instance is already initialized.");
         }
         instance = new ClientConnection(parameter);
     }

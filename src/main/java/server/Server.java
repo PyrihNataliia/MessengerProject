@@ -3,21 +3,17 @@ package server;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
 import java.time.LocalDateTime;
 
 public class Server extends JFrame{
-    private ServerSocket serverSocket;
     private static volatile boolean isStarted = false;
     private JTextArea textArea1;
     private JButton startButton;
     private JButton stopButton;
     private JPanel serverPanel;
+    private ServerConnector serverConnector;
 
-    public Server() {
+    public Server(ServerConnector sc) {
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -30,10 +26,11 @@ public class Server extends JFrame{
                 stop();
             }
         });
+        serverConnector=sc;
     }
 
     public static void main(String[] args) {
-        Server s= new Server();
+        Server s= s= new Server(new ServerConnector());
         s.setContentPane(s.serverPanel);
         s.setTitle("Server side");
         s.setSize(480, 320);
@@ -48,46 +45,21 @@ public class Server extends JFrame{
     }
 
     private void start(){
-        try  {
-            serverSocket = new ServerSocket(8080);
             isStarted= true;
             writeText("Server was started");
             startButton.setEnabled(false);
             stopButton.setEnabled(true);
-
-        }
-        catch (SocketException e) {
-            System.out.println("Server is closed");
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
     }
 
-    private void  connectClient(){
-            while(true){
-                try {
-                    Socket clientSocket = serverSocket.accept();
-                    new Thread(new ServerLogic(clientSocket)).start();
-                    isStarted = true;
-
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
+    private void connectClient(){
+            isStarted = true;
+            serverConnector.connectClient();
+            writeText("New user has connected");
     }
     private void stop(){
         int stopQuestion= JOptionPane.showConfirmDialog(this, "Do you confirm the stop of the server?","Confirm the stop", JOptionPane.YES_NO_OPTION);
         if(stopQuestion==JOptionPane.YES_OPTION){
-            try {
-                if(serverSocket!=null){
-                serverSocket.close();
-                System.out.println(serverSocket.isClosed());}
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            serverConnector.closeServer();
             writeText("The server was stopped");
             startButton.setEnabled(true);
             stopButton.setEnabled(false);

@@ -2,6 +2,7 @@ package com.example.messengerproject;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.List;
 
 
 public class Client {
@@ -20,47 +21,63 @@ public class Client {
             bufferedReader= new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
         } catch (IOException e) {
-            cleanAndClose();
-            throw new RuntimeException(e);
+            closeAll(socket, bufferedReader, bufferedWriter);
+            //throw new RuntimeException(e);
         }
     }
 
     public void initializeUser(String name, String password, String type ){
+        String str= String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>%s</type><user><name>%s</name><password>%s</password></user></message>", type, name, password);
+       sendMessage(str);
+    }
+    public void sendForUserList(){
+        String str= "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>userList</type></message>";
+        sendMessage(str);
+    }
 
-        String str= String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>%s</type><name>%s</name><password>%s</password></message>", type, name, password);
+    private void sendMessage(String str){
         try {
             bufferedWriter.write(str);
             bufferedWriter.newLine();
             bufferedWriter.flush();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            closeAll(socket, bufferedReader, bufferedWriter);
+            //throw new RuntimeException(e);
         }
-
     }
     private void workWithMessages(){
         try {
             String messageFromServer= bufferedReader.readLine();
-            System.out.println(messageFromServer);
             ds = new DeserializeClass(messageFromServer);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
+
+    public List<String> getUserList(){
+        workWithMessages();
+        return ds.getUserList();
+    }
+
     public String getStatus(){
         workWithMessages();
-        System.out.println(ds.getStatus());
         return ds.getStatus();
     }
-    private void cleanAndClose() {
-        if(bufferedWriter!= null || bufferedReader!=null){
-            try {
-                bufferedWriter.close();
+
+
+    public void closeAll(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter){
+        try{
+            if(bufferedReader!=null){
                 bufferedReader.close();
             }
-            catch (IOException e) {
-                throw new RuntimeException(e);
+            if(bufferedWriter!= null){
+                bufferedWriter.close();
             }
+            if(socket!=null){
+                socket.close();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

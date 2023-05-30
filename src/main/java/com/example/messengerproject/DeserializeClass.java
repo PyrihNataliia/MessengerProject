@@ -38,7 +38,7 @@ public class DeserializeClass {
         if(messageType.equals("logIn")||messageType.equals("signUp") ){
             status = rootElement.getChildText("status");
         }
-        else if(messageType.equals("UserList")){
+        else if(messageType.equals("userList")){
             List<Element> userElements=rootElement.getChild("users").getChildren("user");
             userList = new ArrayList<>();
             for (Element userElement : userElements) {

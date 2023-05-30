@@ -11,36 +11,31 @@
 <?import javafx.scene.paint.Stop?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #6E260E;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.messengerproject.logInContoller">
+<AnchorPane prefHeight="378.0" prefWidth="602.0" style="-fx-background-color: #6E260E;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.messengerproject.logInContoller">
     <children>
-        <Pane layoutY="83.0" prefHeight="319.0" prefWidth="601.0" style="-fx-background-color: #C4A484;">
+        <Pane layoutY="83.0" prefHeight="295.0" prefWidth="602.0" style="-fx-background-color: #C4A484;">
             <children>
-                <TextField fx:id="tf_userName" layoutX="179.0" layoutY="97.0" promptText="UserName">
+                <TextField fx:id="tf_userName" layoutX="179.0" layoutY="55.0" promptText="UserName">
                     <font>
                         <Font name="Microsoft YaHei Light" size="19.0" />
                     </font>
                 </TextField>
-                <Button fx:id="bt_logIn_l" layoutX="264.0" layoutY="216.0" mnemonicParsing="false"  style="-fx-background-radius: 5;" text="Log in">
+                <Button fx:id="bt_logIn_l" layoutX="265.0" layoutY="194.0" mnemonicParsing="false" style="-fx-background-radius: 5;" text="Log in">
                     <font>
                         <Font name="Microsoft YaHei" size="17.0" />
                     </font>
                 </Button>
-                <Label layoutX="157.0" layoutY="270.0" prefHeight="20.0" prefWidth="172.0" text="Don't have an account ?">
+                <Label layoutX="155.0" layoutY="255.0" prefHeight="20.0" prefWidth="172.0" text="Don't have an account ?">
                     <font>
                         <Font name="Microsoft YaHei Light" size="15.0" />
                     </font>
                 </Label>
-                <Button fx:id="bt_signUp_l" layoutX="337.0" layoutY="265.0" mnemonicParsing="false"  style="-fx-background-color: #C4A484;" text="Sign Up" textAlignment="CENTER" textFill="#1c1853" underline="true">
+                <Button fx:id="bt_signUp_l" layoutX="337.0" layoutY="250.0" mnemonicParsing="false" style="-fx-background-color: #C4A484;" text="Sign Up" textAlignment="CENTER" textFill="#1c1853" underline="true">
                     <font>
                         <Font name="Microsoft YaHei" size="15.0" />
                     </font>
                 </Button>
-                <TextField fx:id="tf_ip" layoutX="179.0" layoutY="41.0" prefHeight="35.0" prefWidth="243.0" promptText="IP Address">
-                    <font>
-                        <Font name="Microsoft YaHei Light" size="16.0" />
-                    </font>
-                </TextField>
-                <PasswordField fx:id="tf_password" layoutX="179.0" layoutY="152.0" promptText="Password">
+                <PasswordField fx:id="tf_password" layoutX="179.0" layoutY="120.0" promptText="Password">
                     <font>
                         <Font name="Microsoft YaHei Light" size="19.0" />
                     </font>
