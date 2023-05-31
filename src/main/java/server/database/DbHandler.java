@@ -1,18 +1,20 @@
 package server.database;
 
 import server.User;
+import server.Message;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.util.List;
 
 public class DbHandler extends Configs {
     Connection dbConnection;
 
     public Connection getConnection(){
-        String connectionString="jdbc:mysql://" +dbHost+":" +dbPort+"/"+dbName;
+        String connectionString="jdbc:mysql://" +dbHost+":" +dbPort+"/"+dbName+"?useUnicode=true&characterEncoding=UTF-8";
         try {
             //Class.forName("com.mysql.jdbc.Driver");
             dbConnection=DriverManager.getConnection(connectionString, dbUser, dbPass);
@@ -54,6 +56,35 @@ public class DbHandler extends Configs {
             PreparedStatement preparedStatement = getConnection().prepareStatement(sqlSelect);
             preparedStatement.setString(1, user.getName());
             preparedStatement.setString(2, user.getPassword());
+            rs = preparedStatement.executeQuery();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return rs;
+    }
+
+    public void WriteMessage(Message message){
+        String sqlInsert="INSERT INTO "+Consts.MESSAGE_TABLE +"("+ Consts.SENDER+","+ Consts.RECIPIENT+","+Consts.TIMESTAMP+","+Consts.TEXT+")"+"VALUES(?,?,?,?)";
+        try {
+            PreparedStatement preparedStatement = getConnection().prepareStatement(sqlInsert);
+            preparedStatement.setString(1, message.getSender());
+            preparedStatement.setString(2, message.getRecipient());
+            preparedStatement.setTimestamp(3, message.getTimeMark());
+            preparedStatement.setString(4, message.getText());
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public ResultSet getChat(List<String> names){
+        ResultSet rs= null;
+        String sqlSelect = "SELECT * FROM "+ Consts.MESSAGE_TABLE+" WHERE "+Consts.SENDER+" = ? AND "+Consts.RECIPIENT+" =? OR "+Consts.SENDER+" =? AND "+Consts.RECIPIENT+" =?";
+        try {
+            PreparedStatement preparedStatement = getConnection().prepareStatement(sqlSelect);
+            preparedStatement.setString(1, names.get(0));
+            preparedStatement.setString(2, names.get(1));
+            preparedStatement.setString(3, names.get(1));
+            preparedStatement.setString(4, names.get(0));
             rs = preparedStatement.executeQuery();
         } catch (SQLException e) {
             throw new RuntimeException(e);

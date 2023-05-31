@@ -7,6 +7,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="431.0" prefWidth="600.0" style="-fx-background-color: #FFF8DC;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.messengerproject.HelloController">
@@ -26,9 +27,12 @@
             <ListView fx:id="lv_connected" layoutX="17.0" layoutY="98.0" prefHeight="307.0" prefWidth="200.0" style="-fx-border-color: #6E260E;" />
             </children>
         </Pane>
-        <ScrollPane fx:id="sp_conversation" layoutX="13.0" layoutY="44.0" prefHeight="338.0" prefWidth="346.0" style="-fx-border-color: #6E260E;" />
+        <ScrollPane fx:id="sp_conversation" layoutX="13.0" layoutY="44.0" prefHeight="338.0" prefWidth="346.0" style="-fx-border-color: #6E260E;">
+         <content>
+            <VBox fx:id="vb_messages" prefHeight="333.0" prefWidth="330.0" />
+         </content></ScrollPane>
         <TextField fx:id="tf_text" layoutX="13.0" layoutY="388.0" prefHeight="26.0" prefWidth="277.0" />
-        <Button fx:id="bt_send" layoutX="300.0" layoutY="387.0" mnemonicParsing="false" text="Send">
+        <Button fx:id="bt_send" layoutX="300.0" layoutY="387.0" mnemonicParsing="false" onAction="#sendMessage" text="Send">
             <font>
                 <Font name="Microsoft YaHei Light" size="15.0" />
             </font>

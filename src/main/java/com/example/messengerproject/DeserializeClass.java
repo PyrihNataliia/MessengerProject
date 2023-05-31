@@ -19,6 +19,7 @@ public class DeserializeClass {
     String status;
 
     List<String> userList;
+    List<Message> messageList;
 
     public DeserializeClass(String message){
         saxBuilder  = new SAXBuilder();
@@ -46,6 +47,17 @@ public class DeserializeClass {
                 userList.add(username);
             }
         }
+        else if(messageType.equals("allChat")){
+            List<Element> messageElements=rootElement.getChild("smss").getChildren("sms");
+            messageList = new ArrayList<>();
+            for (Element messageElement : messageElements) {
+                String sender = messageElement.getChildText("sender");
+                String recipient = messageElement.getChildText("recipient");
+                String text = messageElement.getChildText("text");
+                Message message= new Message(sender, recipient, text);
+                messageList.add(message);
+            }
+        }
     }
 
     public String getStatus() {
@@ -54,6 +66,10 @@ public class DeserializeClass {
 
     public List<String> getUserList() {
         return userList;
+    }
+
+    public List<Message> getMessageList(){
+        return messageList;
     }
 
 }

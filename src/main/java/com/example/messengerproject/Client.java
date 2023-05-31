@@ -35,6 +35,14 @@ public class Client {
         sendMessage(str);
     }
 
+    public void sendUserMessage(String sender, String recipient, String text){
+        String str=String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>chat</type><sms><sender>%s</sender><recipient>%s</recipient><text>%s</text></sms></message>", sender, recipient, text);
+        sendMessage(str);
+    }
+    public void sendFoAllMessages(String user1, String user2){
+        String str=String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>getAllChat</type><smsInfo><user>%s</user><user>%s</user></smsInfo></message>", user1, user2);
+        sendMessage(str);
+    }
     private void sendMessage(String str){
         try {
             bufferedWriter.write(str);
@@ -63,7 +71,10 @@ public class Client {
         workWithMessages();
         return ds.getStatus();
     }
-
+    public List<Message> getMessageList(){
+    workWithMessages();
+    return ds.getMessageList();
+    }
 
     public void closeAll(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter){
         try{

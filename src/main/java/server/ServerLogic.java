@@ -12,6 +12,7 @@ import java.net.Socket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ServerLogic implements Runnable {
 
@@ -19,7 +20,7 @@ public class ServerLogic implements Runnable {
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
     private User user;
-
+    private Message message;
     private static ArrayList<String> userNames= new ArrayList<>();
 
     public ServerLogic(Socket socket){
@@ -88,8 +89,16 @@ public class ServerLogic implements Runnable {
         else{
             if(type.equals("userList")){
                 String str=getUserList();
-                System.out.println(str);
                 sendToUser(str);
+            }
+            else if(type.equals("chat")){
+                message=saxp.getMessage();
+                setMessage();
+            }
+            else if(type.equals("getAllChat")){
+                String str=getAllChat(saxp.getChatNames());
+                sendToUser(str);
+                System.out.println(str);
             }
         }
     }
@@ -132,11 +141,35 @@ public class ServerLogic implements Runnable {
     private String getUserList(){
         String str = String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>userList</type><users>");
        for(String s:userNames){
-           str+=String.format("<user>%s</user>", s);
+           if(!s.equalsIgnoreCase(user.getName())){
+                str+=String.format("<user>%s</user>", s);
+           }
        }
         str+="</users></message>";
         return str;
     }
+
+    private void setMessage(){
+        DbHandler dbHandler= new DbHandler();
+        dbHandler.WriteMessage(message);
+    }
+    private String getAllChat(List<String> names)  {
+        DbHandler dbHandler= new DbHandler();
+        ResultSet rs= dbHandler.getChat(names);
+        String str= String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>allChat</type><smss>");
+        try {
+            while(rs.next()){
+            str+=String.format("<sms><sender>%s</sender><recipient>%s</recipient><text>%s</text></sms>",rs.getString("sender"),rs.getString("recipient"), rs.getString("text"));
+        }
+        }
+        catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+        str+="</smss></message>";
+        return str;
+    }
+
     public void removeUser(String name){
         userNames.remove(name);
         //System.out.println(userNames);
