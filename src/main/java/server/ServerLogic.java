@@ -11,6 +11,7 @@ import java.io.*;
 import java.net.Socket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,8 @@ public class ServerLogic implements Runnable {
     private BufferedWriter bufferedWriter;
     private User user;
     private Message message;
+
+    private Timestamp timeMark;
     private static ArrayList<String> userNames= new ArrayList<>();
 
     public ServerLogic(Socket socket){
@@ -95,10 +98,9 @@ public class ServerLogic implements Runnable {
                 message=saxp.getMessage();
                 setMessage();
             }
-            else if(type.equals("getAllChat")){
-                String str=getAllChat(saxp.getChatNames());
+            else if(type.equals("getAllChat")||type.equals("getNewChat")){
+                String str=getChat(saxp.getChatNames(), type);
                 sendToUser(str);
-                System.out.println(str);
             }
         }
     }
@@ -153,26 +155,34 @@ public class ServerLogic implements Runnable {
         DbHandler dbHandler= new DbHandler();
         dbHandler.WriteMessage(message);
     }
-    private String getAllChat(List<String> names)  {
+    private String getChat(List<String> names, String type)  {
         DbHandler dbHandler= new DbHandler();
-        ResultSet rs= dbHandler.getChat(names);
-        String str= String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>allChat</type><smss>");
-        try {
-            while(rs.next()){
-            str+=String.format("<sms><sender>%s</sender><recipient>%s</recipient><text>%s</text></sms>",rs.getString("sender"),rs.getString("recipient"), rs.getString("text"));
+        ResultSet rs;
+        if(type.equalsIgnoreCase("getAllChat")){
+                rs=dbHandler.getChat(names);
+            timeMark = new Timestamp(System.currentTimeMillis());
         }
+        else{
+            rs = dbHandler.getNewChat(names, timeMark);
+            timeMark = new Timestamp(System.currentTimeMillis());
+        }
+        String str= String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>%s</type><smss>", type);
+        try {
+            while(rs.next()) {
+                str += String.format("<sms><sender>%s</sender><recipient>%s</recipient><text>%s</text></sms>", rs.getString("sender"), rs.getString("recipient"), rs.getString("text"));
+            }
         }
         catch (SQLException e) {
                 throw new RuntimeException(e);
             }
 
         str+="</smss></message>";
+        System.out.println(str);
         return str;
     }
 
     public void removeUser(String name){
         userNames.remove(name);
-        //System.out.println(userNames);
     }
 
     public void closeAll(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter){

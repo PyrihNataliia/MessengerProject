@@ -47,7 +47,7 @@ public class DeserializeClass {
                 userList.add(username);
             }
         }
-        else if(messageType.equals("allChat")){
+        else if(messageType.equals("getAllChat")||messageType.equals("getNewChat")){
             List<Element> messageElements=rootElement.getChild("smss").getChildren("sms");
             messageList = new ArrayList<>();
             for (Element messageElement : messageElements) {

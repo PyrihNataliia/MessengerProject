@@ -43,6 +43,10 @@ public class Client {
         String str=String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>getAllChat</type><smsInfo><user>%s</user><user>%s</user></smsInfo></message>", user1, user2);
         sendMessage(str);
     }
+    public void sendForNewMessages(String user1, String user2){
+        String str=String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>getNewChat</type><smsInfo><user>%s</user><user>%s</user></smsInfo></message>", user1, user2);
+        sendMessage(str);
+    }
     private void sendMessage(String str){
         try {
             bufferedWriter.write(str);

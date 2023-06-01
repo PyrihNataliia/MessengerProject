@@ -3,11 +3,7 @@ package server.database;
 import server.User;
 import server.Message;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.util.List;
 
 public class DbHandler extends Configs {
@@ -78,13 +74,29 @@ public class DbHandler extends Configs {
     }
     public ResultSet getChat(List<String> names){
         ResultSet rs= null;
-        String sqlSelect = "SELECT * FROM "+ Consts.MESSAGE_TABLE+" WHERE "+Consts.SENDER+" = ? AND "+Consts.RECIPIENT+" =? OR "+Consts.SENDER+" =? AND "+Consts.RECIPIENT+" =?";
+        String sqlSelect = "SELECT * FROM "+ Consts.MESSAGE_TABLE+" WHERE "+Consts.SENDER+" = ? AND "+Consts.RECIPIENT+" =? OR "+Consts.SENDER+" =? AND "+Consts.RECIPIENT+" =? ORDER BY "+ Consts.TIMESTAMP;
         try {
             PreparedStatement preparedStatement = getConnection().prepareStatement(sqlSelect);
             preparedStatement.setString(1, names.get(0));
             preparedStatement.setString(2, names.get(1));
             preparedStatement.setString(3, names.get(1));
             preparedStatement.setString(4, names.get(0));
+            rs = preparedStatement.executeQuery();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return rs;
+    }
+    public ResultSet getNewChat(List<String> names, Timestamp timemark){
+        ResultSet rs= null;
+        String sqlSelect = "SELECT * FROM "+ Consts.MESSAGE_TABLE+" WHERE ("+Consts.SENDER+" = ? AND "+Consts.RECIPIENT+" =? OR "+ Consts.SENDER+" =? AND "+Consts.RECIPIENT+" =?) AND "+Consts.TIMESTAMP +" >?"+ " ORDER BY "+ Consts.TIMESTAMP;
+        try {
+            PreparedStatement preparedStatement = getConnection().prepareStatement(sqlSelect);
+            preparedStatement.setString(1, names.get(0));
+            preparedStatement.setString(2, names.get(1));
+            preparedStatement.setString(3, names.get(1));
+            preparedStatement.setString(4, names.get(0));
+            preparedStatement.setTimestamp(5, timemark);
             rs = preparedStatement.executeQuery();
         } catch (SQLException e) {
             throw new RuntimeException(e);
