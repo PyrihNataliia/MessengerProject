@@ -13,7 +13,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ServerLogic implements Runnable {
 
@@ -25,6 +27,7 @@ public class ServerLogic implements Runnable {
 
     private Timestamp timeMark;
     private static ArrayList<String> userNames= new ArrayList<>();
+    private static Map<String, ServerLogic> users= new HashMap<>();
 
     public ServerLogic(Socket socket){
         this.socket=socket;
@@ -47,12 +50,14 @@ public class ServerLogic implements Runnable {
                 SaxParser saxp = new SaxParser();
                 InputStream m2 = new ByteArrayInputStream(message.getBytes());
                 parser.parse(m2, saxp);
-                //userNames.add(user.getName());
                 doAction(saxp,saxp.getType());
             } catch (IOException e){
-                userNames.remove(user.getName());
                 closeAllandRemove(socket, bufferedReader, bufferedWriter, user.getName());
                 System.out.println(userNames);
+                users.remove(user.getName());
+                for (ServerLogic user : users.values()) {
+                    user.sendToUser(getUserList());
+                }
                 break;
             }
             catch (SAXException | ParserConfigurationException e) {
@@ -86,6 +91,11 @@ public class ServerLogic implements Runnable {
         sendToUser(str);
         if(status.equals("Success")){
             userNames.add(user.getName());
+            users.put(user.getName(), this);
+            String usersStr=getUserList();
+            for (ServerLogic user : users.values()) {
+                user.sendToUser(usersStr);
+            }
             System.out.println("user:"+userNames);
             }
         }
@@ -97,6 +107,14 @@ public class ServerLogic implements Runnable {
             else if(type.equals("chat")){
                 message=saxp.getMessage();
                 setMessage();
+                ServerLogic recipientClient = users.get(message.getRecipient());
+                System.out.println(message.getRecipient());
+                System.out.println(users);
+                if(recipientClient!=null){
+                    String str=getMessage();
+                    sendToUser(str);
+                    recipientClient.sendToUser(str);
+                }
             }
             else if(type.equals("getAllChat")||type.equals("getNewChat")){
                 String str=getChat(saxp.getChatNames(), type);
@@ -141,11 +159,9 @@ public class ServerLogic implements Runnable {
        }
     }
     private String getUserList(){
-        String str = String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>userList</type><users>");
+       String str = String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>userList</type><users>");
        for(String s:userNames){
-           if(!s.equalsIgnoreCase(user.getName())){
                 str+=String.format("<user>%s</user>", s);
-           }
        }
         str+="</users></message>";
         return str;
@@ -155,17 +171,21 @@ public class ServerLogic implements Runnable {
         DbHandler dbHandler= new DbHandler();
         dbHandler.WriteMessage(message);
     }
+   private String getMessage(){
+        String str= String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>getMessage</type><sms><sender>%s</sender><recipient>%s</recipient><text>%s</text></sms></message>", message.getSender(), message.getRecipient(), message.getText());
+        return str;
+    }
     private String getChat(List<String> names, String type)  {
         DbHandler dbHandler= new DbHandler();
-        ResultSet rs;
-        if(type.equalsIgnoreCase("getAllChat")){
-                rs=dbHandler.getChat(names);
+        ResultSet rs=dbHandler.getChat(names);
+        /*if(type.equalsIgnoreCase("getAllChat")){
+            rs;
             timeMark = new Timestamp(System.currentTimeMillis());
-        }
-        else{
+        }*/
+        /*else{
             rs = dbHandler.getNewChat(names, timeMark);
             timeMark = new Timestamp(System.currentTimeMillis());
-        }
+        }*/
         String str= String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>%s</type><smss>", type);
         try {
             while(rs.next()) {
@@ -177,7 +197,6 @@ public class ServerLogic implements Runnable {
             }
 
         str+="</smss></message>";
-        System.out.println(str);
         return str;
     }
 

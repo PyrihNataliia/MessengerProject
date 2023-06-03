@@ -20,6 +20,7 @@ public class DeserializeClass {
 
     List<String> userList;
     List<Message> messageList;
+    Message message;
 
     public DeserializeClass(String message){
         saxBuilder  = new SAXBuilder();
@@ -35,7 +36,7 @@ public class DeserializeClass {
         workWithMessage();
     }
 
-    public void workWithMessage(){
+    public synchronized void workWithMessage(){
         if(messageType.equals("logIn")||messageType.equals("signUp") ){
             status = rootElement.getChildText("status");
         }
@@ -58,6 +59,13 @@ public class DeserializeClass {
                 messageList.add(message);
             }
         }
+        else if(messageType.equals("getMessage")){
+            Element ms= rootElement.getChild("sms");
+            String sender= ms.getChildText("sender");
+            String recipient = ms.getChildText("recipient");
+            String text = ms.getChildText("text");
+            message = new Message(sender, recipient, text);
+        }
     }
 
     public String getStatus() {
@@ -72,4 +80,10 @@ public class DeserializeClass {
         return messageList;
     }
 
+    public Message getNewMessage(){
+        return message;
+    }
+    public String getMessageType(){
+        return messageType;
+    }
 }

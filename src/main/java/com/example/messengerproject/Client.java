@@ -2,6 +2,7 @@ package com.example.messengerproject;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -12,8 +13,7 @@ public class Client {
 
     private BufferedReader bufferedReader;
     private DeserializeClass ds;
-
-
+    private InfoFromServer info= new InfoFromServer();
     public Client(Socket socket){
         this.socket=socket;
         try {
@@ -28,7 +28,7 @@ public class Client {
 
     public void initializeUser(String name, String password, String type ){
         String str= String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>%s</type><user><name>%s</name><password>%s</password></user></message>", type, name, password);
-       sendMessage(str);
+        sendMessage(str);
     }
     public void sendForUserList(){
         String str= "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>userList</type></message>";
@@ -41,12 +41,13 @@ public class Client {
     }
     public void sendFoAllMessages(String user1, String user2){
         String str=String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>getAllChat</type><smsInfo><user>%s</user><user>%s</user></smsInfo></message>", user1, user2);
+        System.out.println("Send "+str);
         sendMessage(str);
     }
-    public void sendForNewMessages(String user1, String user2){
+   /* public void sendForNewMessages(String user1, String user2){
         String str=String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>getNewChat</type><smsInfo><user>%s</user><user>%s</user></smsInfo></message>", user1, user2);
         sendMessage(str);
-    }
+    }*/
     private void sendMessage(String str){
         try {
             bufferedWriter.write(str);
@@ -57,7 +58,33 @@ public class Client {
             //throw new RuntimeException(e);
         }
     }
-    private void workWithMessages(){
+    public void startListening() {
+        Thread messageListenerThread = new Thread(this::listenForMessages);
+        messageListenerThread.setDaemon(true);
+        messageListenerThread.start();
+    }
+
+    private void listenForMessages() {
+        try {
+            while (true) {
+                String message = bufferedReader.readLine();
+                /////////
+                System.out.println("Get: "+ message);
+                if (message == null) {
+                    break;
+                }
+            else{
+                ds = new DeserializeClass(message);
+                processMessage(ds);
+            }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            closeAll(socket, bufferedReader, bufferedWriter);
+        }
+    }
+    private void workWithMessage(){
         try {
             String messageFromServer= bufferedReader.readLine();
             ds = new DeserializeClass(messageFromServer);
@@ -65,19 +92,42 @@ public class Client {
             throw new RuntimeException(e);
         }
     }
-
+    private synchronized void processMessage(DeserializeClass ds) {
+        String messageType = ds.getMessageType();
+        /*if (messageType.equals("logIn")||messageType.equals("signUp")) {
+            info.setStatus(ds.getStatus());
+            System.out.println("1" + info.getStatus());
+        } */
+        if (messageType.equals("userList")) {
+           info.setOnlineUsers(ds.getUserList());
+        } else if (messageType.equals("getAllChat")||messageType.equals("getNewChat")) {
+            info.setReceivedMessages(ds.getMessageList());
+        }
+        else if(messageType.equals("getMessage")){
+            info.setDelivered(true);
+            info.setMessage(ds.getNewMessage());
+            System.out.println(info.getMessage());
+        }
+    }
     public List<String> getUserList(){
-        workWithMessages();
-        return ds.getUserList();
+        return info.getOnlineUsers();
     }
 
     public String getStatus(){
-        workWithMessages();
+        workWithMessage();
         return ds.getStatus();
     }
     public List<Message> getMessageList(){
-    workWithMessages();
-    return ds.getMessageList();
+    return info.getReceivedMessages();
+    }
+    public Message getMessage(){
+        if(info.getDelivered()){
+            info.setDelivered(false);
+        return info.getMessage();
+        }
+        else{
+            return null;
+        }
     }
 
     public void closeAll(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter){

@@ -30,7 +30,7 @@ public class Server extends JFrame{
     }
 
     public static void main(String[] args) {
-        Server s= s= new Server(new ServerConnector());
+        Server s= new Server(new ServerConnector());
         s.setContentPane(s.serverPanel);
         s.setTitle("Server side");
         s.setSize(480, 320);
