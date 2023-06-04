@@ -103,4 +103,28 @@ public class DbHandler extends Configs {
         }
         return rs;
     }
+    public ResultSet getRegisteredUsers(){
+        ResultSet rs= null;
+        String sqlSelect = "SELECT "+Consts.USER_NAME +" FROM "+ Consts.USER_TABLE;
+        try {
+            PreparedStatement preparedStatement = getConnection().prepareStatement(sqlSelect);
+            rs = preparedStatement.executeQuery();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return rs;
+    }
+    public ResultSet getUserChat(String userName){
+        ResultSet rs= null;
+        String sqlSelect = "SELECT "+Consts.SENDER +", " + Consts.TEXT + " FROM "+ Consts.MESSAGE_TABLE+" WHERE ( "+Consts.SENDER+ "=?" +" OR "+ Consts.RECIPIENT+" =? ) ORDER BY " +Consts.TIMESTAMP;
+        try {
+            PreparedStatement preparedStatement = getConnection().prepareStatement(sqlSelect);
+            preparedStatement.setString(1, userName);
+            preparedStatement.setString(2, userName);
+            rs = preparedStatement.executeQuery();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return rs;
+    }
 }

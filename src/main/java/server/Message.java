@@ -12,6 +12,10 @@ public class Message {
         timeMark = new Timestamp(System.currentTimeMillis());
     }
 
+    public Message(String sender, String message){
+        this.sender=sender;
+        this.text=message;
+    }
     public String getSender() {
         return sender;
     }

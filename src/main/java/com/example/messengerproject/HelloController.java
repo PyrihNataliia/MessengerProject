@@ -22,9 +22,6 @@ import javafx.util.Duration;
 
 import java.net.URL;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Semaphore;
-import java.util.function.Consumer;
 
 public class HelloController implements Initializable {
 
