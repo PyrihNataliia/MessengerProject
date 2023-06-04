@@ -80,7 +80,6 @@ public class Server extends JFrame implements RegistrationCallback{
                 Socket clientSocket = serverSocket.accept();
                 serverLogic = new ServerLogic(clientSocket, this);
                 new Thread(serverLogic).start();
-                //System.out.println("User connected");
 
             } catch (IOException e) {
                 e.printStackTrace();

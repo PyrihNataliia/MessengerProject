@@ -44,7 +44,4 @@ public class Message {
         return timeMark;
     }
 
-    public void setTimeMark(Timestamp timeMark) {
-        this.timeMark = timeMark;
-    }
 }

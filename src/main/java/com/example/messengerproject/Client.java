@@ -2,7 +2,6 @@ package com.example.messengerproject;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -22,7 +21,6 @@ public class Client {
 
         } catch (IOException e) {
             closeAll(socket, bufferedReader, bufferedWriter);
-            //throw new RuntimeException(e);
         }
     }
 
@@ -30,24 +28,14 @@ public class Client {
         String str= String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>%s</type><user><name>%s</name><password>%s</password></user></message>", type, name, password);
         sendMessage(str);
     }
-    public void sendForUserList(){
-        String str= "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>userList</type></message>";
-        sendMessage(str);
-    }
-
     public void sendUserMessage(String sender, String recipient, String text){
         String str=String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>chat</type><sms><sender>%s</sender><recipient>%s</recipient><text>%s</text></sms></message>", sender, recipient, text);
         sendMessage(str);
     }
     public void sendFoAllMessages(String user1, String user2){
         String str=String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>getAllChat</type><smsInfo><user>%s</user><user>%s</user></smsInfo></message>", user1, user2);
-        System.out.println("Send "+str);
         sendMessage(str);
     }
-   /* public void sendForNewMessages(String user1, String user2){
-        String str=String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><message><type>getNewChat</type><smsInfo><user>%s</user><user>%s</user></smsInfo></message>", user1, user2);
-        sendMessage(str);
-    }*/
     private void sendMessage(String str){
         try {
             bufferedWriter.write(str);
@@ -55,7 +43,6 @@ public class Client {
             bufferedWriter.flush();
         } catch (IOException e) {
             closeAll(socket, bufferedReader, bufferedWriter);
-            //throw new RuntimeException(e);
         }
     }
     public void startListening() {
@@ -68,8 +55,6 @@ public class Client {
         try {
             while (true) {
                 String message = bufferedReader.readLine();
-                /////////
-                System.out.println("Get: "+ message);
                 if (message == null) {
                     break;
                 }
@@ -94,10 +79,6 @@ public class Client {
     }
     private synchronized void processMessage(DeserializeClass ds) {
         String messageType = ds.getMessageType();
-        /*if (messageType.equals("logIn")||messageType.equals("signUp")) {
-            info.setStatus(ds.getStatus());
-            System.out.println("1" + info.getStatus());
-        } */
         if (messageType.equals("userList")) {
            info.setOnlineUsers(ds.getUserList());
         } else if (messageType.equals("getAllChat")||messageType.equals("getNewChat")) {

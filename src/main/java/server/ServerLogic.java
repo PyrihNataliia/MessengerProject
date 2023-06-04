@@ -23,10 +23,8 @@ public class ServerLogic implements Runnable {
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
     private User user;
-
     private static String currentUserName;
     private Message message;
-
     private static Map<String, ServerLogic> users= new HashMap<>();
     private RegistrationCallback registrationCallback;
 
@@ -40,6 +38,40 @@ public class ServerLogic implements Runnable {
         } catch (IOException e) {
             closeAllandRemove(socket, bufferedReader, bufferedWriter, user.getName());
         }
+    }
+
+    public static ArrayList<String> getUsers(){
+        ArrayList<String> names= new ArrayList<>();
+        DbHandler dbHandler= new DbHandler();
+        ResultSet rs=dbHandler.getRegisteredUsers();
+        try {
+            while(rs.next()){
+                names.add(rs.getString(Consts.USER_NAME));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return names;
+    }
+    public static ArrayList<Message> getMessages(String userName){
+        ArrayList<Message> messeges= new ArrayList<>();
+        DbHandler dbHandler= new DbHandler();
+        ResultSet rs=dbHandler.getUserChat(userName);
+        try {
+            while(rs.next()){
+                messeges.add(new Message(rs.getString(Consts.SENDER), rs.getString(Consts.TEXT)));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return messeges;
+    }
+
+    public static void setCurrentUserName(String name){
+        currentUserName=name;
+    }
+    public void setRegistrationCallback(RegistrationCallback callback) {
+        this.registrationCallback = callback;
     }
 
     private void getUserInformation(){
@@ -119,7 +151,7 @@ public class ServerLogic implements Runnable {
                     }
                 }
             }
-            else if(type.equals("getAllChat")||type.equals("getNewChat")){
+            else if(type.equals("getAllChat")){
                 String str=getChat(saxp.getChatNames(), type);
                 sendToUser(str);
             }
@@ -212,39 +244,6 @@ public class ServerLogic implements Runnable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-    public static ArrayList<String> getUsers(){
-        ArrayList<String> names= new ArrayList<>();
-        DbHandler dbHandler= new DbHandler();
-        ResultSet rs=dbHandler.getRegisteredUsers();
-            try {
-                while(rs.next()){
-                    names.add(rs.getString(Consts.USER_NAME));
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        return names;
-    }
-    public static ArrayList<Message> getMessages(String userName){
-        ArrayList<Message> messeges= new ArrayList<>();
-        DbHandler dbHandler= new DbHandler();
-        ResultSet rs=dbHandler.getUserChat(userName);
-        try {
-            while(rs.next()){
-               messeges.add(new Message(rs.getString(Consts.SENDER), rs.getString(Consts.TEXT)));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return messeges;
-    }
-
-    public static void setCurrentUserName(String name){
-        currentUserName=name;
-    }
-    public void setRegistrationCallback(RegistrationCallback callback) {
-        this.registrationCallback = callback;
     }
     @Override
     public void run() {
