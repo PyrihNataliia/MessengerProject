@@ -87,7 +87,6 @@ public class Client {
         else if(messageType.equals("getMessage")){
             info.setDelivered(true);
             info.setMessage(ds.getNewMessage());
-            System.out.println(info.getMessage());
         }
     }
     public List<String> getUserList(){
